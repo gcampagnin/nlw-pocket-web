@@ -7,17 +7,17 @@ import { createGoalCompletion } from '../http/create-goal-completion'
 export function PendingGoals() {
   const queryClient = useQueryClient()
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['pending-goals'],
     queryFn: getPendingGoals,
   })
 
-  if (isLoading || !data) {
+  if (!data) {
     return null
   }
 
-  async function handleCreateGoalCompletion(goalId: string) {
-    await createGoalCompletion({ goalId })
+  async function handleCompleteGoal(goalId: string) {
+    await createGoalCompletion(goalId)
 
     queryClient.invalidateQueries({ queryKey: ['pending-goals'] })
     queryClient.invalidateQueries({ queryKey: ['summary'] })
@@ -25,11 +25,11 @@ export function PendingGoals() {
 
   return (
     <div className="flex flex-wrap gap-3">
-      {data.pendingGoals.map(goal => {
+      {data.map(goal => {
         return (
           <OutlineButton
             key={goal.id}
-            onClick={() => handleCreateGoalCompletion(goal.id)}
+            onClick={() => handleCompleteGoal(goal.id)}
             disabled={goal.completionCount >= goal.desiredWeeklyFrequency}
           >
             <Plus className="size-4 text-zinc-600" />
